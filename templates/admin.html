@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<style>
+			table, td {
+ 				 border: 1px solid black;
+ 				 border-collapse: collapse;
+			}
+		</style>
+	</head>
+	<body>
+	<center>
+		<table>
+			 {% for row in tablee %}
+		<tr>
+			<td>{{ row[0] }}</a></td>
+			<td>{{ row[1] }}</td>
+			<td>{{ row[2] }}</td>
+		</tr>
+		{% endfor %}
+			</table>
+		<br/>
+		<form action="http://localhost:5000/delete" method="POST">
+			<input type="text" name="NN" id="NN" placeholder="Name" ><br/><br/>
+			<input type="submit" value="submit">
+		</form>
+		{% if pro %}
+           {{pro}}
+           {% endif %}
+	</center>
+	</body>
+</html>

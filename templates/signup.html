@@ -1,22 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
-    
-        <link rel="stylesheet" type="text/css" href="static/styles/ProjectCss.css">
-</head>
-    <body >
-            <br/><br/><br/><br/>
-                <form  name = "form1" id = "from1"  onsubmit="IDValidator();return false">
-                    <span name = "dudu" id ="dudu">
-                    <input type="text" name="name" id="name" placeholder="Name"><br/><br/>
-                        <p id="demo0" name="demo0"></p>
-                        <input type="password" name="PP" id="PP" placeholder="password" ><br/><br/>
-                        <p id="demo1" name="demo1"></p>
-                        <input type="text" name="id" id="id" placeholder="id"><br/><br/>
-                        <center><p id="demo" name="demo">hello</p></center>
-                        <input type="submit" value="submit" >
-                        <br/><br/><br/><br/>
-                    </span>
+    <body>
+        <center>
+                <form action="http://localhost:5000/result" method="POST" name = "form1" id = "from1">
+                   
                         <span name = "sun" id = "sun">Sunday</span>
                             <select name = "sunday" id = "sunday">
                                 <option >none</option>
@@ -44,7 +31,7 @@
                                 <option>12:45-13:30</option>
                                 <option>12:00-13:30</option>
                             </select>
-
+                            
                             <span name = "tue" id = "tue">Tuesday</span>
                             <select name = "tuesday" id = "tuesday">
                                 <option >none</option>
@@ -86,7 +73,7 @@
                                 <option>12:45-13:30</option>
                                 <option>12:00-13:30</option>
                             </select>
-
+                            
                             <span name = "fri" id = "fri">Friday</span>
                             <select name = "friday" id = "friday">
                                 <option >none</option>
@@ -100,11 +87,10 @@
                                 <option>12:45-13:30</option>
                                 <option>12:00-13:30</option>
                             </select>
+                    <input type="submit" value="submit">
             </form>
-            <span name = "signin1" id = "signin1">
-            <form action="http://localhost:5000/sign_in" method="POST">
-                 <input type="submit" value="sign in" target="signin">
-            </form>
-        </span>
+        </center>
    </body>
 </html>
+
+
