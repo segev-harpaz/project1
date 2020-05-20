@@ -176,5 +176,35 @@ def delete():
             return render_template('admin.html', pro='this user is not exist in the database', tablee=tablee)
 
 
+@app.route('/sign_in2/create_class', methods=['POST', 'GET'])
+def createe():
+    connect_db()
+    global cursor
+    table_data = get_data()
+    if request.method == 'POST':
+        result = request.form
+        result1 = str(result)[:-2]
+        num = result1.split(',')
+        data = []
+        for i in range(1, len(result), 2):
+            data.append(num[i][2:-2])
+        sql = 'CREATE TABLE admin (name varchar(20)'
+        day = 22
+        month = ['May', 'june']
+        x = month[0]
+        for i in range(30):
+            sql += ', ' + x + str(day) + ' varchar(1)'
+            day += 1
+            if day > 31:
+                day = 1
+                x = month[1]
+        sql += ')'
+        cursor.execute(sql)
+        conn.commit()
+        for i in data:
+            cursor.execute('INSERT INTO admin(name) VALUES(%s)', i)
+            conn.commit()
+
+
 if __name__ == '__main__':
     app.run(debug=True)
