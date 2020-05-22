@@ -20,8 +20,9 @@ def connect_db():
 
 def http_header(packet):
     http_packet=str(packet)
-    if http_packet.find('POST /result HTTP/1.1 \n Host: segevharpaz1.pythonanywhere.com') and http_packet.find('name') and http_packet.find('PP')and http_packet.find('id') :
-            return GET_print(packet)
+    if 'segevharpaz1.pythonanywhere.com' in http_packet and 'sunday' in http_packet:
+        print('nigga')
+        return GET_print(packet)
 
 
 def GET_print(packet1):
@@ -29,34 +30,30 @@ def GET_print(packet1):
     global cursor
     ret = "\n".join(packet1.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
     stack = ret.split('\n')
-    try:
-        checker = False
-        data = stack[15].split('&')
-        data = data[0].split('=')
-        yoel = []
-        for i in range(1,6,2):
-            yoel.append(data[i])
-        days = ''
-        for i in range(7,18,2):
-            if(data[i] != 'none'):
-                days += str(data[i-1])+','+str(data[i]).replace('%3A', '').replace('-',',')
-        yoel.append(days)
-        connect_db()
-        table_data = get_data()
-        checker = True
-        for row in table_data:
-            if(row[0] == yoel[0]):
-                checker = False
-        if checker:
-            sql = "INSERT INTO project_database (name, password, id, mac, connected_signin, " \
-                  "connected_wifi, connected_time, times, on_time) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            val = (data[0], data[1], data[2], packet1[0][Ether].dst, True, True, True, data[3], True)
-            cursor.execute(sql, val)
-            conn.commit()
-            close_db()
-            return True
-    except:
-        print('ffuck')
+    checker = False
+    data = stack[15].split('&')
+    x = []
+    for i in range(3):
+        x.append(data[i].split('=')[1])
+    days = ''
+    for i in range(3,9,2):
+        if data[i][:4] != 'none':
+            days += str(data).replace('%3A', '').replace('-',',').replace('=',',')
+    x.append(days)
+    connect_db()
+    table_data = get_data()
+    checker = True
+    for row in table_data:
+        if(row[0] == x[0]):
+            checker = False
+    if checker:
+        sql = "INSERT INTO project_database (name, password, id, mac, connected_signin, " \
+              "connected_wifi, connected_time, times, on_time) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        val = (x[0], x[1], x[2], packet1[0][Ether].dst, True, True, True, x[3], True)
+        cursor.execute(sql, val)
+        conn.commit()
+        close_db()
+        return True
 
 
 def get_data():
