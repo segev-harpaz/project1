@@ -1,6 +1,7 @@
 from scapy.all import *
 import psycopg2
-from threading import Thread
+from threading import Thread, Timer
+from datetime import timedelta, date
 
 
 def close_db():
@@ -32,17 +33,28 @@ def GET_print(packet1):
         checker = False
         data = stack[15].split('&')
         data = data[0].split('=')
+        yoel = []
+        for i in range(1,6,2):
+            yoel.append(data[i])
+        days = ''
+        for i in range(7,18,2):
+            if(data[i] != 'none'):
+                days += str(data[i-1])+','+str(data[i]).replace('%3A', '').replace('-',',')
+        yoel.append(days)
         connect_db()
         table_data = get_data()
-        print(data[1])
-        print(table_data)
+        checker = True
         for row in table_data:
-            if(row[0] == data[1]):
-                print(packet1[0][Ether].dst)
-                cursor.execute(('UPDATE project_database SET mac = %s WHERE name = %s'), (packet1[0][Ether].dst, row[0]))
-                conn.commit()
-                close_db()
-        return True
+            if(row[0] == yoel[0]):
+                checker = False
+        if checker:
+            sql = "INSERT INTO project_database (name, password, id, mac, connected_signin, " \
+                  "connected_wifi, connected_time, times, on_time) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            val = (data[0], data[1], data[2], packet1[0][Ether].dst, True, True, True, data[3], True)
+            cursor.execute(sql, val)
+            conn.commit()
+            close_db()
+            return True
     except:
         print('ffuck')
 
@@ -87,11 +99,66 @@ def sniff2():
         sniff(count=1, lfilter=http_header, filter="tcp port 80", iface="wlan0")
 
 
+def dudu(q):
+    if not q:
+        return create_q()
+    global cursor
+    connect_db()
+    cursor.execute('UPDATE project_database SET connected_wifi=%s, connected_signin = %s, connected_time = %s',
+                   (False, False, False))
+    data = q.pop(0)
+    Timer(data, dudu, args=q).start()
+
+
+def arrive_late(q):
+    if not q:
+        return create_q()
+    global cursor
+    global conn
+    table_data = get_data()
+    today = date.today()
+    for row in table_data:
+        if (bool(row[6] and bool(row[5]) and bool(row[4]))):
+            if (row[8]):
+                print(0)
+                cursor.execute("UPDATE admin SET " + 'a' + str(today)[6:].replace('-', '') + "=%s WHERE name=%s",(0, row[0]))
+                conn.commit()
+            else:
+                print(1)
+                cursor.execute("UPDATE admin SET " + 'a' + str(today)[6:].replace('-', '') + "=%s WHERE name=%s",(3, row[0]))
+                conn.commit()
+        else:
+            print(2)
+            cursor.execute("UPDATE admin SET " + 'a' + str(today)[6:].replace('-', '') + "=%s WHERE name=%s",(4, row[0]))
+            conn.commit()
+    close_db()
+    x = q.pop(0)
+    Timer(x, arrive_late, [q]).start()
+
+
+def create_q():
+    q = [timedelta(hours=2).total_seconds(), timedelta(hours=2).total_seconds(),
+         timedelta(hours=1.75).total_seconds()]
+    now = datetime.now().strftime('%H:%M:%S')
+    now = datetime.strptime(now, '%H:%M:%S')
+    reset_connection = datetime.strptime('8:20:00', "%H:%M:%S")
+    late_check = datetime.strptime('8:16:00', "%H:%M:%S")
+    delay = (reset_connection - now).total_seconds()
+    delay1 = (late_check - now).total_seconds()
+    if delay < 0:
+        delay += timedelta(hours=24).total_seconds()
+    if delay1 < 0:
+        delay1 += timedelta(hours=24).total_seconds()
+    Timer(delay, dudu, [q]).start()
+    Timer(delay1, arrive_late, [q]).start()
+
+
 def main():
     t = Thread(target = sniff1)
     t.start()
     s = Thread(target = sniff2)
     s.start()
+    create_q()
             
 
 if __name__ == '__main__':
